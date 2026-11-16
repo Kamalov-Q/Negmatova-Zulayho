@@ -34,7 +34,7 @@ export const uz = {
     department: "Pedagogika va o'qitish metodikasi kafedrasi",
     university: "Iqtisodiyot va pedagogika universiteti",
     subject: "Pedagoglik kasbiga kirish",
-    speciality: "Ta'lim-tarbiya nazariyasi va metodikasi (Boshlang'ich ta'lim)",
+    speciality: "Boshlang'ich ta'limda tarbiya",
     address: "Qashqadaryo viloyati, Qarshi shahri",
     roleFull: "Pedagogika va o'qitish metodikasi kafedrasi o'qituvchisi",
   },
@@ -73,7 +73,7 @@ export const uz = {
   university: {
     eyebrow: "Universitet",
     description:
-      "Universitet bakalavriat va magistratura yo'nalishlarida kunduzgi hamda sirtqi ta'lim shakllari bo'yicha mutaxassislar tayyorlaydi. Quyida 2024-yilgi qabul yo'nalishlaridan ba'zilari keltirilgan.",
+      "Universitet bakalavriat va magistratura yo'nalishlarida kunduzgi hamda sirtqi ta'lim shakllari bo'yicha mutaxassislar tayyorlaydi.",
     address: "Qashqadaryo viloyati, Qarshi shahri, Ravoq MFY, I. Karimov ko'chasi, 13-U",
     contacts: { phone: "Telefon", email: "Elektron pochta", address: "Manzil" },
     linkSite: "Universitet sayti",

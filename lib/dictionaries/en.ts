@@ -31,7 +31,7 @@ export const en: Dictionary = {
     department: "Department of Pedagogy and Teaching Methodology",
     university: "University of Economics and Pedagogy",
     subject: "Introduction to the Teaching Profession",
-    speciality: "Theory and Methodology of Education (Primary Education)",
+    speciality: "Upbringing in Primary Education",
     address: "Qashqadaryo region, Qarshi city",
     roleFull: "Lecturer at the Department of Pedagogy and Teaching Methodology",
   },
@@ -70,7 +70,7 @@ export const en: Dictionary = {
   university: {
     eyebrow: "University",
     description:
-      "The university trains specialists across bachelor's and master's programmes, in both full-time and part-time formats. Below are some of the 2024 admission tracks.",
+      "The university trains specialists across bachelor's and master's programmes, in both full-time and part-time formats.",
     address: "13-U I. Karimov street, Ravoq neighbourhood, Qarshi, Qashqadaryo region",
     contacts: { phone: "Phone", email: "Email", address: "Address" },
     linkSite: "University website",
