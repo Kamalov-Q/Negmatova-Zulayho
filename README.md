@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Negmatova Zulayho — shaxsiy sayt
 
-## Getting Started
+"Pedagoglik kasbiga kirish" fani bo'yicha o'quv materiallari, ochiq dars suratlari va
+talabalar bilan aloqa sahifasi. Next.js (App Router) + Tailwind CSS v4.
 
-First, run the development server:
+## Ishga tushirish
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # ishlab chiqarish uchun yig'ish
+npm start        # yig'ilgan versiyani ishga tushirish
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Muhit o'zgaruvchilari (`.env.local`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| O'zgaruvchi | Vazifasi |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Saytning haqiqiy domeni. Ijtimoiy tarmoq preview rasmlari shu manzilga nisbatan hisoblanadi. |
+| `TELEGRAM_BOT_TOKEN` | Ixtiyoriy. Berilsa, aloqa formasidagi xabarlar Telegramga yuboriladi. |
+| `TELEGRAM_CHAT_ID` | Ixtiyoriy. Xabar yuboriladigan chat ID. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Telegram sozlanmagan bo'lsa, forma baribir ishlaydi: xabar server logiga yoziladi va
+foydalanuvchi muvaffaqiyat xabarini ko'radi.
 
-## Learn More
+## Tuzilishi
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  layout.tsx            # metadata, shriftlar, skip-link
+  page.tsx              # bo'limlar tartibi
+  globals.css           # dizayn tokenlari, light/dark rejim
+  api/contact/route.ts  # aloqa formasi uchun endpoint
+components/             # Header, Hero, AboutMe, University, Materials,
+                        # OpenLesson + Gallery, Contact, Footer, BackToTop
+lib/content.ts          # saytdagi BARCHA matn, havola va rasmlar
+public/media/           # suratlar
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Matn, telefon, havola yoki material qo'shish uchun faqat `lib/content.ts` faylini
+tahrirlash kifoya — komponentlarga tegish shart emas.

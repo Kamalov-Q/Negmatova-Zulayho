@@ -1,26 +1,135 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-brand-50: #eefafb;
+  --color-brand-100: #d2f1f5;
+  --color-brand-200: #ace3ea;
+  --color-brand-300: #74ced9;
+  --color-brand-400: #36b0c2;
+  --color-brand-500: #1a94aa;
+  --color-brand-600: #16788f;
+  --color-brand-700: #166175;
+  --color-brand-800: #18505f;
+  --color-brand-900: #194351;
+  --color-brand-950: #0a2b36;
+
+  --color-accent-400: #f87171;
+  --color-accent-500: #f04444;
+  --color-accent-600: #dc2f2f;
+
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-4xl: 2rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --surface: #ffffff;
+  --surface-muted: #f6f8f9;
+  --ink: #0d1b20;
+  --ink-muted: #4a5c63;
+  --hairline: rgb(13 27 32 / 0.1);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface: #0b1416;
+    --surface-muted: #101d21;
+    --ink: #e9f1f2;
+    --ink-muted: #9db0b6;
+    --hairline: rgb(233 241 242 / 0.14);
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* keeps anchored sections clear of the sticky header */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background: var(--surface);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-brand-500);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility surface {
+  background-color: var(--surface);
+}
+
+@utility surface-muted {
+  background-color: var(--surface-muted);
+}
+
+@utility text-ink {
+  color: var(--ink);
+}
+
+@utility text-ink-muted {
+  color: var(--ink-muted);
+}
+
+@utility border-hairline {
+  border-color: var(--hairline);
+}
+
+/* Scroll-reveal: visible by default so content never depends on JS */
+.reveal {
+  opacity: 1;
+}
+
+.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hide the horizontal scrollbar on the gallery rail */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

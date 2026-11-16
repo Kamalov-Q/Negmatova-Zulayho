@@ -5,6 +5,13 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      // The site copy is in Uzbek, where the apostrophe in o', g' and ta'lim is part
+      // of normal spelling. Escaping every one of them would make the text unreadable.
+      "react/no-unescaped-entities": "off",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
