@@ -17,6 +17,11 @@
   --color-accent-500: #f04444;
   --color-accent-600: #dc2f2f;
 
+  --color-success-400: #22c48a;
+  --color-success-500: #0b8259;
+  --color-success-600: #097049;
+  --color-success-700: #075c3c;
+
   --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
@@ -32,14 +37,37 @@
   color-scheme: light;
 }
 
+/* Dark palette. Applied when the OS asks for it and the visitor has not pinned
+   light, or whenever they have explicitly chosen dark via the header toggle. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --surface: #0b1416;
     --surface-muted: #101d21;
     --ink: #e9f1f2;
     --ink-muted: #9db0b6;
     --hairline: rgb(233 241 242 / 0.14);
     color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --surface: #0b1416;
+  --surface-muted: #101d21;
+  --ink: #e9f1f2;
+  --ink-muted: #9db0b6;
+  --hairline: rgb(233 241 242 / 0.14);
+  color-scheme: dark;
+}
+
+/* Keeps Tailwind's `dark:` utilities in step with the tokens above. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
   }
 }
 
@@ -102,24 +130,29 @@
   border-color: var(--hairline);
 }
 
-/* Scroll-reveal: visible by default so content never depends on JS */
+/* Scroll-reveal: visible by default, so content never depends on JS. It is only
+   hidden where scripting is actually available to reveal it again — which the
+   browser answers in CSS, with no class written onto <html> before hydration. */
 .reveal {
   opacity: 1;
 }
 
-.js .reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
+@media (scripting: enabled) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
 
-.js .reveal.is-visible {
-  opacity: 1;
-  transform: none;
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js .reveal {
+  .reveal,
+  .reveal.is-visible {
     opacity: 1;
     transform: none;
   }

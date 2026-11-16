@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { materials, materialsAvailable } from "@/lib/content";
+import { materialFiles, materialIds, materialsAvailable } from "@/lib/content";
+import type { Dictionary } from "@/lib/dictionaries";
 import { Reveal } from "./reveal";
 import { SectionHeading } from "./section-heading";
 import { ArrowRightIcon, FileIcon } from "./icons";
 
-const TOAST_MESSAGE = "Yaqinda qo'shiladi";
 const TOAST_DURATION = 2600;
 
-export function Materials() {
+export function Materials({ dict }: { dict: Dictionary }) {
   const [toastVisible, setToastVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -34,17 +34,19 @@ export function Materials() {
     <section id="materiallar" className="scroll-mt-24 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Fanga oid materiallar"
-          title="O'quv materiallari"
+          eyebrow={dict.materials.eyebrow}
+          title={dict.materials.title}
           description={
             materialsAvailable
-              ? "Har bir material Google Drive’da saqlanadi va yangi oynada ochiladi. Yuklab olish uchun fayl ustidagi yuklash tugmasidan foydalaning."
-              : "Fan bo'yicha materiallar ro'yxati quyida keltirilgan. Fayllar hozircha tayyorlanmoqda va tez orada shu yerdan ochiladi."
+              ? dict.materials.descriptionAvailable
+              : dict.materials.descriptionSoon
           }
         />
 
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {materials.map((material, index) => {
+          {materialIds.map((id, index) => {
+            const file = materialFiles[id];
+            const item = dict.materials.items[id];
             const body = (
               <>
                 <div className="flex items-start justify-between gap-3">
@@ -52,29 +54,29 @@ export function Materials() {
                     <FileIcon className="size-6" />
                   </span>
                   <span className="rounded-full border border-hairline px-2.5 py-1 text-[11px] font-bold tracking-wider text-ink-muted">
-                    {material.type}
+                    {file.type}
                   </span>
                 </div>
 
                 <h3 className="mt-5 font-display text-lg font-bold leading-snug text-ink text-pretty">
-                  {material.title}
+                  {item.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted text-pretty">
-                  {material.description}
+                  {item.description}
                 </p>
 
                 <span className="mt-auto flex items-center gap-2 pt-6 text-sm font-bold text-brand-600 dark:text-brand-300">
-                  {materialsAvailable ? "Ochish" : "Tez orada"}
+                  {materialsAvailable ? dict.materials.ctaOpen : dict.materials.ctaSoon}
                   <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-1" />
                 </span>
               </>
             );
 
             return (
-              <Reveal as="li" key={material.title} delay={(index % 3) * 70}>
+              <Reveal as="li" key={id} delay={(index % 3) * 70}>
                 {materialsAvailable ? (
                   <a
-                    href={material.href}
+                    href={file.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cardClassName}
@@ -94,8 +96,7 @@ export function Materials() {
         {materialsAvailable ? (
           <Reveal className="mt-8">
             <p className="rounded-2xl border border-dashed border-hairline px-5 py-4 text-sm text-ink-muted">
-              Fayl ochilmasa yoki ruxsat so'ralsa, Telegram orqali yozing — havolani yangilab
-              beraman.
+              {dict.materials.note}
             </p>
           </Reveal>
         ) : null}
@@ -114,7 +115,7 @@ export function Materials() {
       >
         {toastVisible ? (
           <span className="rounded-full bg-brand-950 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-brand-950/30 ring-1 ring-white/10">
-            {TOAST_MESSAGE}
+            {dict.materials.toast}
           </span>
         ) : null}
       </div>

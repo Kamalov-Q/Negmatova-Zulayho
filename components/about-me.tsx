@@ -1,17 +1,11 @@
 import Image from "next/image";
 import type { ReactElement, SVGProps } from "react";
 import { person } from "@/lib/content";
+import type { Dictionary } from "@/lib/dictionaries";
+import { fill } from "@/lib/i18n";
 import { Reveal } from "./reveal";
 import { SectionHeading } from "./section-heading";
 import { MailIcon, MapPinIcon, PhoneIcon, TelegramIcon } from "./icons";
-
-const facts = [
-  { label: "F.I.O", value: person.name },
-  { label: "Ish joyi", value: person.university },
-  { label: "Lavozim", value: person.role },
-  { label: "Mutaxassisligi", value: person.speciality },
-  { label: "Kafedra", value: person.department },
-];
 
 type ContactRow = {
   label: string;
@@ -21,24 +15,50 @@ type ContactRow = {
   external?: boolean;
 };
 
-const contacts: ContactRow[] = [
-  { label: "Telefon", value: person.phone.label, href: person.phone.href, Icon: PhoneIcon },
-  // Pochta manzili `lib/content.ts` da to'ldirilganda ushbu qator o'zi qo'shiladi.
-  ...(person.email
-    ? [{ label: "Elektron pochta", value: person.email.label, href: person.email.href, Icon: MailIcon }]
-    : []),
-  { label: "Telegram", value: person.telegram.label, href: person.telegram.href, Icon: TelegramIcon, external: true },
-  { label: "Manzil", value: person.address, Icon: MapPinIcon },
-];
+export function AboutMe({ dict }: { dict: Dictionary }) {
+  const facts = [
+    { label: dict.about.facts.name, value: person.name },
+    { label: dict.about.facts.workplace, value: dict.person.university },
+    { label: dict.about.facts.position, value: dict.person.role },
+    { label: dict.about.facts.speciality, value: dict.person.speciality },
+    { label: dict.about.facts.department, value: dict.person.department },
+  ];
 
-export function AboutMe() {
+  const contacts: ContactRow[] = [
+    {
+      label: dict.about.contacts.phone,
+      value: person.phone.label,
+      href: person.phone.href,
+      Icon: PhoneIcon,
+    },
+    // Pochta manzili `lib/content.ts` da to'ldirilganda ushbu qator o'zi qo'shiladi.
+    ...(person.email
+      ? [
+          {
+            label: dict.about.contacts.email,
+            value: person.email.label,
+            href: person.email.href,
+            Icon: MailIcon,
+          },
+        ]
+      : []),
+    {
+      label: dict.about.contacts.telegram,
+      value: person.telegram.label,
+      href: person.telegram.href,
+      Icon: TelegramIcon,
+      external: true,
+    },
+    { label: dict.about.contacts.address, value: dict.person.address, Icon: MapPinIcon },
+  ];
+
   return (
     <section id="men-haqimda" className="scroll-mt-24 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Men haqimda"
-          title="Tanishib oling"
-          description="Fanni o'qitish, talabalar bilan ishlash va uslubiy materiallar tayyorlash bo'yicha faoliyat olib boraman."
+          eyebrow={dict.about.eyebrow}
+          title={dict.about.title}
+          description={dict.about.description}
           align="left"
         />
 
@@ -49,15 +69,15 @@ export function AboutMe() {
               <div className="absolute -inset-3 -z-10 rounded-[2.25rem] bg-gradient-to-br from-brand-200 to-brand-50 dark:from-brand-700/40 dark:to-brand-900/40" />
               <Image
                 src={person.portrait}
-                alt={`${person.name} — portret surati`}
-                width={800}
-                height={1066}
+                alt={fill(dict.about.portraitAlt, { name: person.name })}
+                width={600}
+                height={800}
                 sizes="384px"
                 className="aspect-[3/4] w-full rounded-4xl object-cover object-top shadow-2xl shadow-brand-900/15"
               />
               <div className="absolute -bottom-5 left-1/2 w-[88%] -translate-x-1/2 rounded-2xl border border-hairline bg-[var(--surface)] px-5 py-4 text-center shadow-xl">
                 <p className="font-display text-base font-bold text-ink">{person.shortName}</p>
-                <p className="mt-0.5 text-sm text-ink-muted">{person.role}</p>
+                <p className="mt-0.5 text-sm text-ink-muted">{dict.person.role}</p>
               </div>
             </div>
           </Reveal>

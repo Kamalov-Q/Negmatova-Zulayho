@@ -23,19 +23,35 @@ npm start        # yig'ilgan versiyani ishga tushirish
 Telegram sozlanmagan bo'lsa, forma baribir ishlaydi: xabar server logiga yoziladi va
 foydalanuvchi muvaffaqiyat xabarini ko'radi.
 
+## Tillar
+
+Sayt uch tilda: o'zbek (`/uz`), rus (`/ru`) va ingliz (`/en`). Ildiz manzil (`/`)
+brauzer tilini aniqlab mos sahifaga yo'naltiradi — buni `proxy.ts` bajaradi.
+Standart til — o'zbekcha.
+
 ## Tuzilishi
 
 ```
 app/
-  layout.tsx            # metadata, shriftlar, skip-link
-  page.tsx              # bo'limlar tartibi
+  [lang]/layout.tsx     # metadata, shriftlar, mavzu skripti, skip-link
+  [lang]/page.tsx       # bo'limlar tartibi
   globals.css           # dizayn tokenlari, light/dark rejim
   api/contact/route.ts  # aloqa formasi uchun endpoint
+proxy.ts                # til aniqlash va yo'naltirish
 components/             # Header, Hero, AboutMe, University, Materials,
                         # OpenLesson + Gallery, Contact, Footer, BackToTop
-lib/content.ts          # saytdagi BARCHA matn, havola va rasmlar
+lib/content.ts          # tilga bog'liq bo'lmagan ma'lumot: havola, rasm, bayroqlar
+lib/i18n.ts             # tillar ro'yxati va yordamchi funksiyalar
+lib/dictionaries/       # uz.ts (asosiy), ru.ts, en.ts — barcha matnlar
 public/media/           # suratlar
 ```
 
-Matn, telefon, havola yoki material qo'shish uchun faqat `lib/content.ts` faylini
-tahrirlash kifoya — komponentlarga tegish shart emas.
+Matnni o'zgartirish uchun `lib/dictionaries/` ichidagi fayllarni tahrirlang.
+`uz.ts` — namuna: unga yangi kalit qo'shilsa, TypeScript `ru.ts` va `en.ts` dan
+ham o'sha kalitni talab qiladi. Havola, rasm va telefon raqamlar esa
+`lib/content.ts` da.
+
+## Mavzu (light / dark)
+
+Boshlang'ich holat — tizim sozlamasi. Sarlavhadagi tugma tanlovni `localStorage`
+ga yozadi va `<html data-theme="light|dark">` orqali qo'llaydi.

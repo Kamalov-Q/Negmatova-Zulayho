@@ -1,8 +1,8 @@
-import { openLesson } from "@/lib/content";
+import type { Dictionary } from "@/lib/dictionaries";
 import { Gallery } from "./gallery";
 import { SectionHeading } from "./section-heading";
 
-export function OpenLesson() {
+export function OpenLesson({ dict }: { dict: Dictionary }) {
   return (
     <section
       id="ochiq-dars"
@@ -10,13 +10,13 @@ export function OpenLesson() {
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Ochiq dars"
-          title={openLesson.title}
-          description={openLesson.description}
+          eyebrow={dict.lesson.eyebrow}
+          title={dict.lesson.title}
+          description={dict.lesson.description}
           tone="dark"
           align="left"
         />
-        <Gallery />
+        <Gallery dict={dict} />
       </div>
     </section>
   );

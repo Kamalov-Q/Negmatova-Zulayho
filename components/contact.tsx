@@ -2,24 +2,64 @@
 
 import { useState, type FormEvent } from "react";
 import { person } from "@/lib/content";
+import type { Dictionary } from "@/lib/dictionaries";
+import type { Locale } from "@/lib/i18n";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
-import { ArrowRightIcon, CheckIcon, MailIcon, PhoneIcon, TelegramIcon } from "./icons";
+import {
+  ArrowRightIcon,
+  CheckIcon,
+  MailIcon,
+  PhoneIcon,
+  SendIcon,
+  SpinnerIcon,
+  TelegramIcon,
+} from "./icons";
 
 type Errors = Partial<Record<"name" | "phone" | "message", string>>;
 type Status = "idle" | "sending" | "sent" | "error";
 
-const fields = [
-  { name: "name", label: "Ism-familiya", type: "text", placeholder: "Aliyeva Nilufar", required: true, autoComplete: "name" },
-  { name: "direction", label: "Yo'nalish", type: "text", placeholder: "Boshlang'ich ta'lim", required: false, autoComplete: "off" },
-  { name: "group", label: "Guruh", type: "text", placeholder: "BT-21/2", required: false, autoComplete: "off" },
-  { name: "phone", label: "Telefon raqam", type: "tel", placeholder: "+998 90 123 45 67", required: true, autoComplete: "tel" },
-] as const;
-
-export function Contact() {
+export function Contact({ dict, lang }: { dict: Dictionary; lang: Locale }) {
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
   const [serverError, setServerError] = useState("");
+
+  const t = dict.contact.form;
+
+  const fields = [
+    {
+      name: "name",
+      label: t.name,
+      type: "text",
+      placeholder: t.namePlaceholder,
+      required: true,
+      autoComplete: "name",
+    },
+    {
+      name: "direction",
+      label: t.direction,
+      type: "text",
+      placeholder: t.directionPlaceholder,
+      required: false,
+      autoComplete: "off",
+    },
+    {
+      name: "group",
+      label: t.group,
+      type: "text",
+      placeholder: t.groupPlaceholder,
+      required: false,
+      autoComplete: "off",
+    },
+    {
+      name: "phone",
+      label: t.phone,
+      type: "tel",
+      placeholder: t.phonePlaceholder,
+      required: true,
+      autoComplete: "tel",
+    },
+  ] as const;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,13 +68,13 @@ export function Contact() {
 
     const nextErrors: Errors = {};
     if (!data.name || data.name.trim().length < 3) {
-      nextErrors.name = "Ism-familiyangizni to'liq kiriting.";
+      nextErrors.name = t.errors.name;
     }
     if (!/^[+()\d\s-]{7,20}$/.test(data.phone ?? "")) {
-      nextErrors.phone = "Telefon raqamni to'g'ri kiriting.";
+      nextErrors.phone = t.errors.phone;
     }
     if (!data.message || data.message.trim().length < 5) {
-      nextErrors.message = "Savolingizni qisqacha yozing.";
+      nextErrors.message = t.errors.message;
     }
 
     setErrors(nextErrors);
@@ -50,13 +90,15 @@ export function Contact() {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        // The locale travels with the request so server-side validation replies
+        // come back in the language the visitor is reading.
+        body: JSON.stringify({ ...data, locale: lang }),
       });
       const result = await response.json();
 
       if (!response.ok || !result.ok) {
         if (result?.errors) setErrors(result.errors as Errors);
-        setServerError(result?.error ?? "Xabar yuborilmadi. Birozdan so'ng urinib ko'ring.");
+        setServerError(result?.error ?? t.genericError);
         setStatus("error");
         return;
       }
@@ -64,7 +106,7 @@ export function Contact() {
       form.reset();
       setStatus("sent");
     } catch {
-      setServerError("Tarmoqda xatolik. Telegram orqali yozib qo'ying.");
+      setServerError(t.networkError);
       setStatus("error");
     }
   }
@@ -73,9 +115,9 @@ export function Contact() {
     <section id="aloqa" className="scroll-mt-24 bg-[var(--surface-muted)] py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Aloqa"
-          title="Menga murojaat qiling"
-          description="Fan doirasidagi savol yoki muammolar bo'yicha xabar qoldiring — imkon qadar tez javob beraman."
+          eyebrow={dict.contact.eyebrow}
+          title={dict.contact.title}
+          description={dict.contact.description}
           align="left"
         />
 
@@ -91,7 +133,9 @@ export function Contact() {
                 <TelegramIcon className="size-6" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-ink-muted">Telegram — eng tezkor yo'l</span>
+                <span className="block text-sm font-semibold text-ink-muted">
+                  {dict.contact.telegramLead}
+                </span>
                 <span className="block truncate font-display text-base font-bold text-ink">
                   {person.telegram.label}
                 </span>
@@ -107,7 +151,9 @@ export function Contact() {
                 <PhoneIcon className="size-6" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-ink-muted">Telefon</span>
+                <span className="block text-sm font-semibold text-ink-muted">
+                  {dict.contact.phoneLabel}
+                </span>
                 <span className="block truncate font-display text-base font-bold text-ink">
                   {person.phone.label}
                 </span>
@@ -123,7 +169,9 @@ export function Contact() {
                   <MailIcon className="size-6" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-ink-muted">Elektron pochta</span>
+                  <span className="block text-sm font-semibold text-ink-muted">
+                    {dict.contact.emailLabel}
+                  </span>
                   <span className="block truncate font-display text-base font-bold text-ink">
                     {person.email.label}
                   </span>
@@ -154,7 +202,7 @@ export function Contact() {
                           </span>
                         ) : (
                           <span className="ml-1.5 text-xs font-normal text-ink-muted">
-                            (ixtiyoriy)
+                            {t.optional}
                           </span>
                         )}
                       </label>
@@ -184,7 +232,7 @@ export function Contact() {
 
                 <div className="sm:col-span-2">
                   <label htmlFor="message" className="mb-1.5 block text-sm font-semibold text-ink">
-                    Xabar
+                    {t.message}
                     <span className="ml-1 text-accent-500" aria-hidden>
                       *
                     </span>
@@ -193,7 +241,7 @@ export function Contact() {
                     id="message"
                     name="message"
                     rows={4}
-                    placeholder="Savolingiz yoki murojaatingizni yozing…"
+                    placeholder={t.messagePlaceholder}
                     required
                     aria-invalid={errors.message ? "true" : undefined}
                     aria-describedby={errors.message ? "message-error" : undefined}
@@ -215,10 +263,21 @@ export function Contact() {
                 <button
                   type="submit"
                   disabled={status === "sending"}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-accent-500/25 transition hover:bg-accent-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  // min-width keeps the button from resizing when the label swaps
+                  // to "sending", which otherwise shifts on every submit.
+                  className="group inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-success-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-success-500/30 transition-all duration-200 hover:bg-success-600 hover:shadow-xl hover:shadow-success-500/35 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-success-500 disabled:hover:shadow-lg sm:w-auto sm:min-w-[13rem]"
                 >
-                  {status === "sending" ? "Yuborilmoqda…" : "Yuborish"}
-                  {status !== "sending" ? <ArrowRightIcon className="size-5" /> : null}
+                  {status === "sending" ? (
+                    <>
+                      <SpinnerIcon className="size-5 animate-spin" />
+                      {t.sending}
+                    </>
+                  ) : (
+                    <>
+                      {t.submit}
+                      <SendIcon className="size-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </>
+                  )}
                 </button>
               </div>
 
@@ -226,7 +285,7 @@ export function Contact() {
                 {status === "sent" ? (
                   <p className="flex items-start gap-2 rounded-2xl bg-brand-50 px-4 py-3 text-sm font-semibold text-brand-700 dark:bg-brand-500/15 dark:text-brand-200">
                     <CheckIcon className="mt-0.5 size-4 shrink-0" />
-                    Xabaringiz yuborildi. Tez orada bog'lanaman.
+                    {t.success}
                   </p>
                 ) : null}
                 {status === "error" && serverError ? (

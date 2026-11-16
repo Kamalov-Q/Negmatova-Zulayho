@@ -1,23 +1,41 @@
 import Image from "next/image";
-import { university } from "@/lib/content";
+import { programIds, university } from "@/lib/content";
+import type { Dictionary } from "@/lib/dictionaries";
+import { fill } from "@/lib/i18n";
 import { Reveal } from "./reveal";
 import { SectionHeading } from "./section-heading";
 import { ExternalIcon, MailIcon, MapPinIcon, PhoneIcon, PlayIcon } from "./icons";
 
-const contacts = [
-  { label: "Telefon", value: university.phone.label, href: university.phone.href, Icon: PhoneIcon },
-  { label: "Elektron pochta", value: university.email.label, href: university.email.href, Icon: MailIcon },
-  { label: "Manzil", value: university.address, Icon: MapPinIcon },
-];
+export function University({ dict }: { dict: Dictionary }) {
+  const contacts = [
+    {
+      label: dict.university.contacts.phone,
+      value: university.phone.label,
+      href: university.phone.href,
+      Icon: PhoneIcon,
+    },
+    {
+      label: dict.university.contacts.email,
+      value: university.email.label,
+      href: university.email.href,
+      Icon: MailIcon,
+    },
+    { label: dict.university.contacts.address, value: dict.university.address, Icon: MapPinIcon },
+  ];
 
-export function University() {
+  const links = [
+    { href: university.website, label: dict.university.linkSite, primary: true },
+    { href: university.hemis, label: dict.university.linkHemis },
+    { href: university.video, label: dict.university.linkVideo, video: true },
+  ];
+
   return (
     <section id="universitet" className="scroll-mt-24 bg-[var(--surface-muted)] py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Universitet"
-          title={university.name}
-          description={university.description}
+          eyebrow={dict.university.eyebrow}
+          title={dict.person.university}
+          description={dict.university.description}
         />
 
         <div className="mt-12 grid gap-4 sm:grid-cols-3">
@@ -52,63 +70,58 @@ export function University() {
 
         <Reveal className="mt-10">
           <div className="flex flex-col gap-3 sm:flex-row">
-            <a
-              href={university.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-brand-700 active:scale-[0.98]"
-            >
-              Universitet sayti
-              <ExternalIcon className="size-4" />
-            </a>
-            <a
-              href={university.hemis}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-hairline bg-[var(--surface)] px-6 py-3.5 text-sm font-bold text-ink transition hover:border-brand-300 active:scale-[0.98]"
-            >
-              Talabalar uchun HEMIS
-              <ExternalIcon className="size-4" />
-            </a>
-            <a
-              href={university.video}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-hairline bg-[var(--surface)] px-6 py-3.5 text-sm font-bold text-ink transition hover:border-brand-300 active:scale-[0.98]"
-            >
-              <PlayIcon className="size-4 text-accent-500" />
-              Universitet haqida video
-            </a>
+            {links.map(({ href, label, primary, video }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={
+                  primary
+                    ? "inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-brand-700 active:scale-[0.98]"
+                    : "inline-flex items-center justify-center gap-2 rounded-full border border-hairline bg-[var(--surface)] px-6 py-3.5 text-sm font-bold text-ink transition hover:border-brand-300 active:scale-[0.98]"
+                }
+              >
+                {video ? <PlayIcon className="size-4 text-accent-500" /> : null}
+                {label}
+                {video ? null : <ExternalIcon className="size-4" />}
+              </a>
+            ))}
           </div>
         </Reveal>
 
         <div className="mt-14">
           <Reveal>
-            <h3 className="font-display text-xl font-bold text-ink">Qabul yo'nalishlari</h3>
+            <h3 className="font-display text-xl font-bold text-ink">
+              {dict.university.programsTitle}
+            </h3>
           </Reveal>
           <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {university.programs.map((program, index) => (
-              <Reveal as="li" key={program.title} delay={index * 60}>
-                <figure className="group h-full overflow-hidden rounded-3xl border border-hairline bg-[var(--surface)] shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-900/10">
-                  <div className="overflow-hidden">
-                    <Image
-                      src={program.image}
-                      alt={`${program.title} yo'nalishi bo'yicha qabul e'loni`}
-                      width={900}
-                      height={900}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <figcaption className="p-5">
-                    <p className="font-display text-base font-bold leading-snug text-ink text-pretty">
-                      {program.title}
-                    </p>
-                    <p className="mt-1 text-sm text-ink-muted">{program.note}</p>
-                  </figcaption>
-                </figure>
-              </Reveal>
-            ))}
+            {programIds.map((id, index) => {
+              const program = dict.university.programs[id];
+              return (
+                <Reveal as="li" key={id} delay={index * 60}>
+                  <figure className="group h-full overflow-hidden rounded-3xl border border-hairline bg-[var(--surface)] shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-900/10">
+                    <div className="overflow-hidden">
+                      <Image
+                        src={university.programImages[id]}
+                        alt={fill(dict.university.programAlt, { title: program.title })}
+                        width={900}
+                        height={900}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <figcaption className="p-5">
+                      <p className="font-display text-base font-bold leading-snug text-ink text-pretty">
+                        {program.title}
+                      </p>
+                      <p className="mt-1 text-sm text-ink-muted">{program.note}</p>
+                    </figcaption>
+                  </figure>
+                </Reveal>
+              );
+            })}
           </ul>
         </div>
       </div>

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getDictionary } from "@/lib/dictionaries";
+import { defaultLocale, hasLocale } from "@/lib/i18n";
 
 type Payload = {
   name?: unknown;
@@ -6,6 +8,7 @@ type Payload = {
   group?: unknown;
   phone?: unknown;
   message?: unknown;
+  locale?: unknown;
 };
 
 const str = (value: unknown, max: number) =>
@@ -16,8 +19,15 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as Payload;
   } catch {
-    return NextResponse.json({ ok: false, error: "So'rov formati noto'g'ri." }, { status: 400 });
+    // The locale is unknown at this point, so fall back to the default.
+    const fallback = getDictionary(defaultLocale).contact.form;
+    return NextResponse.json({ ok: false, error: fallback.badRequest }, { status: 400 });
   }
+
+  // Route Handlers cannot read root params, so the client sends its locale along.
+  const rawLocale = str(body.locale, 5);
+  const locale = hasLocale(rawLocale) ? rawLocale : defaultLocale;
+  const t = getDictionary(locale).contact.form;
 
   const name = str(body.name, 120);
   const direction = str(body.direction, 120);
@@ -26,9 +36,9 @@ export async function POST(request: Request) {
   const message = str(body.message, 2000);
 
   const errors: Record<string, string> = {};
-  if (name.length < 3) errors.name = "Ism-familiyangizni to'liq kiriting.";
-  if (!/^[+()\d\s-]{7,20}$/.test(phone)) errors.phone = "Telefon raqamni to'g'ri kiriting.";
-  if (message.length < 5) errors.message = "Xabar kamida 5 ta belgidan iborat bo'lsin.";
+  if (name.length < 3) errors.name = t.errors.name;
+  if (!/^[+()\d\s-]{7,20}$/.test(phone)) errors.phone = t.errors.phone;
+  if (message.length < 5) errors.message = t.errors.message;
 
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ ok: false, errors }, { status: 422 });
@@ -42,6 +52,7 @@ export async function POST(request: Request) {
   if (token && chatId) {
     const text = [
       "📩 Saytdan yangi murojaat",
+      `🌐 ${locale.toUpperCase()}`,
       `👤 ${name}`,
       direction ? `🎓 ${direction}` : null,
       group ? `👥 ${group}` : null,
@@ -61,20 +72,14 @@ export async function POST(request: Request) {
 
       if (!response.ok) {
         console.error("Telegram delivery failed:", response.status, await response.text());
-        return NextResponse.json(
-          { ok: false, error: "Xabarni yuborishda xatolik. Telegram orqali yozing." },
-          { status: 502 },
-        );
+        return NextResponse.json({ ok: false, error: t.sendFailed }, { status: 502 });
       }
     } catch (error) {
       console.error("Telegram request error:", error);
-      return NextResponse.json(
-        { ok: false, error: "Xabarni yuborishda xatolik. Telegram orqali yozing." },
-        { status: 502 },
-      );
+      return NextResponse.json({ ok: false, error: t.sendFailed }, { status: 502 });
     }
   } else {
-    console.info("[contact] new message", { name, direction, group, phone, message });
+    console.info("[contact] new message", { locale, name, direction, group, phone, message });
   }
 
   return NextResponse.json({ ok: true });

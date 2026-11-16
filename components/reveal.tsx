@@ -11,7 +11,7 @@ type RevealProps = {
 
 /**
  * Fades content in as it enters the viewport. Content starts visible and is only
- * hidden once the `js` class is present, so it never disappears without JS.
+ * hidden under `@media (scripting: enabled)`, so it never disappears without JS.
  */
 export function Reveal({ children, className = "", delay = 0, as = "div" }: RevealProps) {
   const ref = useRef<HTMLElement>(null);

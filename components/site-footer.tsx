@@ -1,4 +1,5 @@
-import { nav, person, university } from "@/lib/content";
+import { navIds, person, university } from "@/lib/content";
+import type { Dictionary } from "@/lib/dictionaries";
 import { MailIcon, MapPinIcon, PhoneIcon, TelegramIcon } from "./icons";
 
 /**
@@ -10,7 +11,7 @@ async function CopyrightYear() {
   return new Date().getFullYear();
 }
 
-export function SiteFooter() {
+export function SiteFooter({ dict }: { dict: Dictionary }) {
   return (
     <footer className="border-t border-hairline bg-[var(--surface)] py-14">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -23,8 +24,7 @@ export function SiteFooter() {
               {person.shortName}
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-muted text-pretty">
-              {person.department} {person.role.toLowerCase()}si. &ldquo;{person.subject}&rdquo; fani
-              bo'yicha o'quv materiallari va talabalar bilan aloqa sahifasi.
+              {dict.footer.tagline}
             </p>
             <a
               href={person.telegram.href}
@@ -33,22 +33,22 @@ export function SiteFooter() {
               className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-600"
             >
               <TelegramIcon className="size-4" />
-              Telegram
+              {dict.common.telegram}
             </a>
           </div>
 
-          <nav aria-label="Pastki menyu">
+          <nav aria-label={dict.common.footerMenu}>
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-ink">
-              Bo'limlar
+              {dict.footer.sectionsTitle}
             </h2>
             <ul className="mt-4 space-y-2.5">
-              {nav.map((item) => (
-                <li key={item.id}>
+              {navIds.map((id) => (
+                <li key={id}>
                   <a
-                    href={`#${item.id}`}
+                    href={`#${id}`}
                     className="text-sm text-ink-muted transition hover:text-brand-600 dark:hover:text-brand-300"
                   >
-                    {item.label}
+                    {dict.nav[id]}
                   </a>
                 </li>
               ))}
@@ -57,7 +57,7 @@ export function SiteFooter() {
 
           <div>
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-ink">
-              Aloqa
+              {dict.footer.contactTitle}
             </h2>
             <ul className="mt-4 space-y-3 text-sm text-ink-muted">
               <li>
@@ -76,7 +76,7 @@ export function SiteFooter() {
               ) : null}
               <li className="flex items-start gap-2.5">
                 <MapPinIcon className="mt-0.5 size-4 shrink-0" />
-                {person.address}
+                {dict.person.address}
               </li>
             </ul>
           </div>
@@ -84,7 +84,7 @@ export function SiteFooter() {
 
         <div className="mt-12 flex flex-col gap-3 border-t border-hairline pt-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © <CopyrightYear /> {person.shortName}. Barcha huquqlar himoyalangan.
+            © <CopyrightYear /> {person.shortName}. {dict.footer.rights}
           </p>
           <a
             href={university.website}
@@ -92,7 +92,7 @@ export function SiteFooter() {
             rel="noopener noreferrer"
             className="transition hover:text-brand-600 dark:hover:text-brand-300"
           >
-            {university.name}
+            {dict.person.university}
           </a>
         </div>
       </div>
