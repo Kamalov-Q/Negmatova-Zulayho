@@ -9,11 +9,21 @@ import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "./icons";
 
 const count = lessonPhotos.length;
 
+// Past a handful of slides a row of dots stops fitting on a phone, so the
+// position is shown as a counter instead.
+const useCounter = count > 6;
+
 export function Gallery({ dict }: { dict: Dictionary }) {
   const railRef = useRef<HTMLUListElement>(null);
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Mirrors `index` so an arrow click reads the live slide even while a previous
+  // smooth scroll is still running — reading state there lost rapid clicks.
+  const indexRef = useRef(0);
+  // Ignore scroll events until a programmatic scroll settles, otherwise the
+  // listener writes back intermediate positions and undoes the click.
+  const lockUntil = useRef(0);
 
   const altFor = useCallback(
     (i: number) => fill(dict.lesson.photoAlt, { n: i + 1 }),
@@ -29,8 +39,24 @@ export function Gallery({ dict }: { dict: Dictionary }) {
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const slideWidth = rail.scrollWidth / count;
-        setIndex(Math.min(count - 1, Math.round(rail.scrollLeft / slideWidth)));
+        if (Date.now() < lockUntil.current) return;
+        const first = rail.firstElementChild as HTMLElement | null;
+        if (!first) return;
+
+        // Measure the slides instead of dividing the rail width: the flex gaps
+        // made that estimate drift further out with every extra slide.
+        let nearest = 0;
+        let smallest = Infinity;
+        for (let i = 0; i < rail.children.length; i += 1) {
+          const slide = rail.children[i] as HTMLElement;
+          const distance = Math.abs(slide.offsetLeft - first.offsetLeft - rail.scrollLeft);
+          if (distance < smallest) {
+            smallest = distance;
+            nearest = i;
+          }
+        }
+        indexRef.current = nearest;
+        setIndex(nearest);
       });
     };
 
@@ -44,10 +70,19 @@ export function Gallery({ dict }: { dict: Dictionary }) {
   const scrollTo = useCallback((next: number) => {
     const rail = railRef.current;
     if (!rail) return;
-    const clamped = (next + count) % count;
-    rail.scrollTo({ left: (rail.scrollWidth / count) * clamped, behavior: "smooth" });
+
+    const clamped = ((next % count) + count) % count;
+    const first = rail.firstElementChild as HTMLElement | null;
+    const target = rail.children[clamped] as HTMLElement | undefined;
+    if (!first || !target) return;
+
+    lockUntil.current = Date.now() + 700;
+    rail.scrollTo({ left: target.offsetLeft - first.offsetLeft, behavior: "smooth" });
+    indexRef.current = clamped;
     setIndex(clamped);
   }, []);
+
+  const step = useCallback((delta: number) => scrollTo(indexRef.current + delta), [scrollTo]);
 
   useEffect(() => {
     if (lightbox === null) return;
@@ -85,8 +120,8 @@ export function Gallery({ dict }: { dict: Dictionary }) {
                 <Image
                   src={src}
                   alt={altFor(i)}
-                  width={1400}
-                  height={1050}
+                  width={1280}
+                  height={960}
                   sizes="(max-width: 768px) 92vw, 46vw"
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                 />
@@ -96,26 +131,37 @@ export function Gallery({ dict }: { dict: Dictionary }) {
         </ul>
 
         <div className="mt-6 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2" role="tablist" aria-label={dict.lesson.photos}>
-            {lessonPhotos.map((src, i) => (
-              <button
-                key={src}
-                type="button"
-                role="tab"
-                aria-selected={index === i}
-                aria-label={fill(dict.lesson.photoLabel, { n: i + 1 })}
-                onClick={() => scrollTo(i)}
-                className={`h-2 rounded-full transition-all ${
-                  index === i ? "w-7 bg-white" : "w-2 bg-white/40 hover:bg-white/70"
-                }`}
-              />
-            ))}
-          </div>
+          {useCounter ? (
+            <p
+              aria-label={fill(dict.lesson.photoLabel, { n: index + 1 })}
+              className="font-display text-sm font-bold tabular-nums text-white"
+            >
+              {String(index + 1).padStart(2, "0")}
+              <span className="mx-1.5 font-normal text-white/40">/</span>
+              <span className="font-normal text-white/60">{String(count).padStart(2, "0")}</span>
+            </p>
+          ) : (
+            <div className="flex items-center gap-2" role="tablist" aria-label={dict.lesson.photos}>
+              {lessonPhotos.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  role="tab"
+                  aria-selected={index === i}
+                  aria-label={fill(dict.lesson.photoLabel, { n: i + 1 })}
+                  onClick={() => scrollTo(i)}
+                  className={`h-2 rounded-full transition-all ${
+                    index === i ? "w-7 bg-white" : "w-2 bg-white/40 hover:bg-white/70"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => scrollTo(index - 1)}
+              onClick={() => step(-1)}
               aria-label={dict.lesson.previous}
               className="grid size-11 place-items-center rounded-full border border-white/30 text-white transition hover:bg-white/15 active:scale-95"
             >
@@ -123,7 +169,7 @@ export function Gallery({ dict }: { dict: Dictionary }) {
             </button>
             <button
               type="button"
-              onClick={() => scrollTo(index + 1)}
+              onClick={() => step(1)}
               aria-label={dict.lesson.next}
               className="grid size-11 place-items-center rounded-full border border-white/30 text-white transition hover:bg-white/15 active:scale-95"
             >
@@ -155,8 +201,8 @@ export function Gallery({ dict }: { dict: Dictionary }) {
             <Image
               src={lessonPhotos[lightbox]}
               alt={altFor(lightbox)}
-              width={1400}
-              height={1050}
+              width={1280}
+              height={960}
               sizes="(max-width: 1024px) 92vw, 896px"
               className="max-h-[78vh] w-full rounded-2xl object-contain"
             />

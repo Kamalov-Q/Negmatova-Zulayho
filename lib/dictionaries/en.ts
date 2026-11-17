@@ -137,7 +137,7 @@ export const en: Dictionary = {
     title: "Integrated lesson",
     description:
       "An integrated lesson was held for second-year part-time students of the Primary Education programme at the University of Economics and Pedagogy, led by Negmatova Zulayho Shermatovna, lecturer at the Department of Pedagogy and Teaching Methodology.",
-    photoAlt: "Open lesson photo coming soon ({n})",
+    photoAlt: "Photo from the integrated lesson ({n})",
     photos: "Photos",
     photoLabel: "Photo {n}",
     enlarge: "Enlarge photo {n}",

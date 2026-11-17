@@ -11,7 +11,11 @@ export const person = {
   shortName: "Negmatova Zulayho",
   initials: "NZ",
   phone: { label: "+998 91 457 21 05", href: "tel:+998914572105" },
-  email: null as { label: string; href: string } | null,
+  // `null` qilinsa, pochta qatorlari sayt bo'ylab avtomatik yashiriladi.
+  email: {
+    label: "zulayhonegmatova9@gmail.com",
+    href: "mailto:zulayhonegmatova9@gmail.com",
+  } as { label: string; href: string } | null,
   telegram: { label: "@negmatovazulayxo", href: "https://t.me/negmatovazulayxo" },
   portrait: "/media/portrait-negmatova.jpg",
 };
@@ -87,11 +91,21 @@ export const materialFiles: Record<MaterialId, { type: string; href: string }> =
   },
 };
 
+/** Ochiq dars mashg'ulotidan olingan suratlar. */
 export const lessonPhotos = [
-  "/media/lesson-placeholder-1.jpg",
-  "/media/lesson-placeholder-2.jpg",
-  "/media/lesson-placeholder-3.jpg",
-  "/media/lesson-placeholder-4.jpg",
+  "/media/dars-01.jpg",
+  "/media/dars-02.jpg",
+  "/media/dars-03.jpg",
+  "/media/dars-04.jpg",
+  "/media/dars-05.jpg",
+  "/media/dars-06.jpg",
+  "/media/dars-07.jpg",
+  "/media/dars-08.jpg",
+  "/media/dars-09.jpg",
+  "/media/dars-10.jpg",
+  "/media/dars-11.jpg",
+  "/media/dars-12.jpg",
+  "/media/dars-13.jpg",
 ];
 
 export const statValues = ["7", "2", "24/7"] as const;

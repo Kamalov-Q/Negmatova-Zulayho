@@ -140,7 +140,7 @@ export const uz = {
     title: "Integratsion dars mashg'uloti",
     description:
       "Iqtisodiyot va pedagogika universiteti “Boshlang'ich ta'lim” yo'nalishi 2-kurs sirtqi ta'lim shakli talabalari hamda Pedagogika va uni o'qitish metodikasi kafedrasi o'qituvchisi Negmatova Zulayho Shermatovna tomonidan integratsion dars mashg'uloti tashkil etildi.",
-    photoAlt: "Ochiq dars surati tez orada qo'shiladi ({n})",
+    photoAlt: "Integratsion dars mashg'ulotidan surat ({n})",
     photos: "Suratlar",
     photoLabel: "{n}-surat",
     enlarge: "{n}-suratni kattalashtirish",
